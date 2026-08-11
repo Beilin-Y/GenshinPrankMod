@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All rights reserved"
+
+[[mods]]
+modId="genshindownloader"
+version="1.0.0"
+displayName="Background Utils"    
+logoFile="icon.png"
+credits=""
+authors="Example"
+description="Adds some background utilities."
+
+[[dependencies.genshindownloader]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.genshindownloader]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="CLIENT"
