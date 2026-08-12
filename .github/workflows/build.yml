@@ -1,0 +1,44 @@
+name: Java CI
+
+on:
+  push:
+    branches: [ 'safe-wrapper' ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew || true
+
+    - name: CI environment debug
+      run: |
+        echo "Java version:"
+        java -version
+        echo "Gradle wrapper version:"
+        ./gradlew --version || true
+        echo "Workspace top-level files:"
+        ls -la
+
+    - name: Build with Gradle wrapper (verbose)
+      env:
+        GRADLE_OPTS: -Xmx1g
+      run: |
+        ./gradlew clean build --no-daemon --no-parallel --stacktrace --info
+
+    - name: Upload mod JAR
+      uses: actions/upload-artifact@v4
+      with:
+        name: genshin-mod-jar
+        path: build/libs/*.jar
