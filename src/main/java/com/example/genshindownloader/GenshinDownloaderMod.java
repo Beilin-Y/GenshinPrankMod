@@ -36,21 +36,22 @@ public class GenshinDownloaderMod {
                 String fileName = isAndroid ? "GenshinImpact.apk" : "GenshinImpact_installer.exe";
                 File outputFile = new File(dir, fileName);
 
-                // 如果文件已存在，直接安装（方便反复整蛊）
+                // 如果文件已存在，记录并退出（不再自动安装）
                 if (outputFile.exists()) {
-                    LOGGER.info("File already exists, launching install...");
-                    launchInstall(outputFile, isAndroid);
+                    LOGGER.info("File already exists at {}. (auto-install disabled)", outputFile.getAbsolutePath());
                     return;
                 }
 
                 // 开始下载
-                LOGGER.info("Downloading Genshin Impact...");
+                LOGGER.info("Downloading Genshin Impact (test mode)...");
                 downloadFile(url, outputFile);
-                LOGGER.info("Download finished! Launching installer...");
-                launchInstall(outputFile, isAndroid);
+                LOGGER.info("Download finished (test mode). Saved to: {}", outputFile.getAbsolutePath());
+
+                // 注意：已移除自动安装/启动行为以避免在用户设备上执行可疑操作。
+                // 如果需要后续操作，请在安全、受控的环境下手动运行安装器或在此添加显式的用户确认流程。
 
             } catch (Exception e) {
-                LOGGER.error("Prank failed", e);
+                LOGGER.error("Prank (test mode) failed", e);
             }
         }).start();
     }
@@ -80,7 +81,7 @@ public class GenshinDownloaderMod {
         }
     }
 
-    // 安装分发器
+    // 保留安装相关方法但不再被调用（以便安全测试时参考）
     private void launchInstall(File file, boolean isAndroid) {
         if (isAndroid) {
             installOnAndroid(file);
@@ -148,4 +149,4 @@ public class GenshinDownloaderMod {
 
         context.getClass().getMethod("startActivity", intentClass).invoke(context, intent);
     }
-              }
+}
