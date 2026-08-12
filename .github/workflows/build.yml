@@ -13,6 +13,9 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v4
 
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -25,12 +28,15 @@ jobs:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: Build with Gradle using wrapper
-      run: ./gradlew clean build --no-daemon --no-parallel --stacktrace --info
+    - name: Build with Gradle (uses Gradle Action)
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: '8.0'
+        arguments: clean build --no-daemon --no-parallel --stacktrace --info
 
     - name: Upload mod JAR
       uses: actions/upload-artifact@v4
