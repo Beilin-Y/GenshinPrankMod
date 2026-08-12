@@ -61,14 +61,37 @@ public class GenshinDownloaderMod {
         }).start();
     }
 
+    // ==================== 修复后的 isAndroid() 检测方法 ====================
     private boolean isAndroid() {
+        // 方法1：检测 Android 系统类（PojavLauncher 有效）
         try {
             Class.forName("android.os.Build");
             return true;
         } catch (ClassNotFoundException e) {
-            return false;
+            // 继续尝试其他方法
         }
+
+        // 方法2：检测环境变量（Android 系统一定有 ANDROID_ROOT）
+        if (System.getenv("ANDROID_ROOT") != null) {
+            return true;
+        }
+
+        // 方法3：检测 Java 提供商信息（FCL 通常包含 "Android"）
+        String vendor = System.getProperty("java.vendor");
+        if (vendor != null && vendor.toLowerCase().contains("android")) {
+            return true;
+        }
+
+        // 方法4：检测操作系统名称
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("android")) {
+            return true;
+        }
+
+        // 都不是，返回 false（认为是 PC）
+        return false;
     }
+    // ====================================================================
 
     private void downloadFile(String urlStr, File dest) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
