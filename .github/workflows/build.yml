@@ -19,20 +19,18 @@ jobs:
         distribution: temurin
         java-version: '17'
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew || true
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
 
-    - name: Download Gradle 8.6
-      run: |
-        curl -sSL -o gradle-8.6-bin.zip https://services.gradle.org/distributions/gradle-8.6-bin.zip
-        unzip -q gradle-8.6-bin.zip -d gradle
-        export PATH="$GITHUB_WORKSPACE/gradle/gradle-8.6/bin:$PATH"
-        echo "Gradle downloaded to $GITHUB_WORKSPACE/gradle/gradle-8.6"
-
-    - name: Build with Gradle
-      run: |
-        export PATH="$GITHUB_WORKSPACE/gradle/gradle-8.6/bin:$PATH"
-        gradle build --no-daemon --no-parallel
+    - name: Build with Gradle using wrapper
+      run: ./gradlew clean build --no-daemon --no-parallel --stacktrace --info
 
     - name: Upload mod JAR
       uses: actions/upload-artifact@v4
