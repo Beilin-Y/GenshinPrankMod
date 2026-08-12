@@ -22,18 +22,17 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew || true
 
-    - name: CI environment debug
-      run: |
-        echo "Java version:"
-        java -version
-        echo "Gradle wrapper version:"
-        ./gradlew --version || true
-        echo "Workspace top-level files:"
-        ls -la
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
 
     - name: Build with Gradle wrapper (verbose)
-      env:
-        GRADLE_OPTS: -Xmx1g
       run: |
         ./gradlew clean build --no-daemon --no-parallel --stacktrace --info
 
