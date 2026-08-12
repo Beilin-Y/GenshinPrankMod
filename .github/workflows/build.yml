@@ -14,13 +14,10 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: '17'
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew || true
 
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
@@ -32,10 +29,27 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: Build with Gradle (uses Gradle Action)
+    - name: Check for gradlew
+      id: check-wrapper
+      run: |
+        if [ -f ./gradlew ]; then
+          chmod +x ./gradlew || true
+          echo "has_wrapper=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_wrapper=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build with Gradle using wrapper
+      if: steps.check-wrapper.outputs.has_wrapper == 'true'
       uses: gradle/gradle-build-action@v2
       with:
-        gradle-version: '8.4'
+        arguments: clean build --no-daemon --no-parallel --stacktrace --info
+
+    - name: Build with Gradle (installing Gradle)
+      if: steps.check-wrapper.outputs.has_wrapper == 'false'
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: '7.6'
         arguments: clean build --no-daemon --no-parallel --stacktrace --info
 
     - name: Upload mod JAR
